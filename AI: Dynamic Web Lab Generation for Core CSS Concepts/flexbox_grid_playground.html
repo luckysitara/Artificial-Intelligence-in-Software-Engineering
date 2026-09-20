@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Flexbox & Grid Interactive Playground</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-dark: #1e293b;
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-dark: #334155;
+      --accent: #38bdf8;
+      --item-bg-1: #3b82f6;
+      --item-bg-2: #8b5cf6;
+      --item-bg-3: #ec4899;
+      --item-bg-4: #f59e0b;
+      --item-bg-5: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      background: var(--panel-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .controls-panel h2 {
+      font-size: 18px;
+      font-weight: 600;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #334155;
+      color: var(--accent);
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-dark);
+      background: #0f172a;
+      font-size: 14px;
+      color: var(--text-light);
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+    }
+
+    select:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* CSS Inspector */
+    .css-inspector {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .css-inspector span.prop { color: #38bdf8; }
+    .css-inspector span.val { color: #facc15; }
+
+    /* Playground / Stage */
+    .stage-container {
+      background: var(--panel-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stage-header {
+      font-size: 14px;
+      color: var(--text-muted);
+      border-bottom: 1px dashed var(--border-dark);
+      padding-bottom: 8px;
+    }
+
+    /* The Container */
+    #container {
+      background: #0b1120;
+      border: 2px dashed #475569;
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 440px;
+      transition: all 0.2s ease-in-out;
+      gap: 16px; /* modern standard layout spacing */
+    }
+
+    /* Items */
+    .item {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 80px;
+      min-height: 80px;
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+      transition: all 0.2s ease-out;
+    }
+
+    .item-1 { background: var(--item-bg-1); }
+    .item-2 { background: var(--item-bg-2); }
+    .item-3 { background: var(--item-bg-3); }
+    .item-4 { background: var(--item-bg-4); }
+    .item-5 { background: var(--item-bg-5); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Visualizing Flexbox & Grid Playground</h1>
+    <p>Dynamically toggle display modes, axis alignments, and grid column configurations.</p>
+  </header>
+
+  <div class="main-layout">
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+      <h2>Container Properties</h2>
+
+      <!-- display -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>display</span>
+          <span class="badge" id="mode-badge">flex</span>
+        </div>
+        <select id="ctrl-display">
+          <option value="flex" selected>flex</option>
+          <option value="grid">grid</option>
+          <option value="block">block</option>
+        </select>
+      </div>
+
+      <!-- flex-direction -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>flex-direction</span>
+          <span class="badge">Flex only</span>
+        </div>
+        <select id="ctrl-direction">
+          <option value="row" selected>row</option>
+          <option value="row-reverse">row-reverse</option>
+          <option value="column">column</option>
+          <option value="column-reverse">column-reverse</option>
+        </select>
+      </div>
+
+      <!-- justify-content -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>justify-content</span>
+          <span class="badge">Flex / Grid</span>
+        </div>
+        <select id="ctrl-justify">
+          <option value="flex-start" selected>flex-start</option>
+          <option value="center">center</option>
+          <option value="flex-end">flex-end</option>
+          <option value="space-between">space-between</option>
+          <option value="space-around">space-around</option>
+          <option value="space-evenly">space-evenly</option>
+        </select>
+      </div>
+
+      <!-- align-items -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>align-items</span>
+          <span class="badge">Flex / Grid</span>
+        </div>
+        <select id="ctrl-align">
+          <option value="stretch" selected>stretch</option>
+          <option value="flex-start">flex-start</option>
+          <option value="center">center</option>
+          <option value="flex-end">flex-end</option>
+          <option value="baseline">baseline</option>
+        </select>
+      </div>
+
+      <!-- grid-template-columns -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>grid-template-columns</span>
+          <span class="badge">Grid only</span>
+        </div>
+        <select id="ctrl-grid-cols">
+          <option value="none">none</option>
+          <option value="1fr 1fr">1fr 1fr</option>
+          <option value="1fr 1fr 1fr" selected>1fr 1fr 1fr</option>
+          <option value="repeat(4, 1fr)">repeat(4, 1fr)</option>
+          <option value="120px 1fr 2fr">120px 1fr 2fr</option>
+        </select>
+      </div>
+
+      <!-- CSS Inspector -->
+      <div class="css-inspector" id="css-preview">
+        #container {<br>
+        &nbsp;&nbsp;<span class="prop">display</span>: <span class="val" id="code-display">flex</span>;<br>
+        <span id="code-flex-props">
+        &nbsp;&nbsp;<span class="prop">flex-direction</span>: <span class="val" id="code-direction">row</span>;<br>
+        </span>
+        <span id="code-grid-props" style="display:none;">
+        &nbsp;&nbsp;<span class="prop">grid-template-columns</span>: <span class="val" id="code-grid-cols">1fr 1fr 1fr</span>;<br>
+        </span>
+        &nbsp;&nbsp;<span class="prop">justify-content</span>: <span class="val" id="code-justify">flex-start</span>;<br>
+        &nbsp;&nbsp;<span class="prop">align-items</span>: <span class="val" id="code-align">stretch</span>;<br>
+        }
+      </div>
+    </div>
+
+    <!-- Playground Stage -->
+    <div class="stage-container">
+      <div class="stage-header">
+        Container Preview (5 child items interacting in real-time)
+      </div>
+      <div id="container">
+        <div class="item item-1">Item 1</div>
+        <div class="item item-2">Item 2</div>
+        <div class="item item-3">Item 3</div>
+        <div class="item item-4">Item 4</div>
+        <div class="item item-5">Item 5</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('container');
+
+    const ctrlDisplay = document.getElementById('ctrl-display');
+    const ctrlDirection = document.getElementById('ctrl-direction');
+    const ctrlJustify = document.getElementById('ctrl-justify');
+    const ctrlAlign = document.getElementById('ctrl-align');
+    const ctrlGridCols = document.getElementById('ctrl-grid-cols');
+    const modeBadge = document.getElementById('mode-badge');
+
+    // Code outputs
+    const codeDisplay = document.getElementById('code-display');
+    const codeDirection = document.getElementById('code-direction');
+    const codeJustify = document.getElementById('code-justify');
+    const codeAlign = document.getElementById('code-align');
+    const codeGridCols = document.getElementById('code-grid-cols');
+    const codeFlexProps = document.getElementById('code-flex-props');
+    const codeGridProps = document.getElementById('code-grid-props');
+
+    function updateContainer() {
+      const displayVal = ctrlDisplay.value;
+      const directionVal = ctrlDirection.value;
+      const justifyVal = ctrlJustify.value;
+      const alignVal = ctrlAlign.value;
+      const gridColsVal = ctrlGridCols.value;
+
+      modeBadge.textContent = displayVal;
+
+      // Enable/disable contextual dropdowns
+      if (displayVal === 'flex') {
+        ctrlDirection.disabled = false;
+        ctrlGridCols.disabled = true;
+        codeFlexProps.style.display = 'inline';
+        codeGridProps.style.display = 'none';
+      } else if (displayVal === 'grid') {
+        ctrlDirection.disabled = true;
+        ctrlGridCols.disabled = false;
+        codeFlexProps.style.display = 'none';
+        codeGridProps.style.display = 'inline';
+      } else {
+        // block
+        ctrlDirection.disabled = true;
+        ctrlGridCols.disabled = true;
+        codeFlexProps.style.display = 'none';
+        codeGridProps.style.display = 'none';
+      }
+
+      // Update Code Preview
+      codeDisplay.textContent = displayVal;
+      codeDirection.textContent = directionVal;
+      codeJustify.textContent = justifyVal;
+      codeAlign.textContent = alignVal;
+      codeGridCols.textContent = gridColsVal;
+
+      // Apply styles to container
+      container.style.display = displayVal;
+      container.style.flexDirection = directionVal;
+      container.style.justifyContent = justifyVal;
+      container.style.alignItems = alignVal;
+
+      if (displayVal === 'grid') {
+        container.style.gridTemplateColumns = gridColsVal === 'none' ? 'none' : gridColsVal;
+      } else {
+        container.style.gridTemplateColumns = 'none';
+      }
+    }
+
+    [ctrlDisplay, ctrlDirection, ctrlJustify, ctrlAlign, ctrlGridCols].forEach(el => {
+      el.addEventListener('change', updateContainer);
+    });
+
+    updateContainer();
+  </script>
+</body>
+</html>

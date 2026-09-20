@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Box Model & Display Interactive Lab</title>
+  <style>
+    :root {
+      --bg-main: #f8fafc;
+      --panel-bg: #ffffff;
+      --text-main: #1e293b;
+      --border-color: #cbd5e1;
+      --color-margin: #fed7aa; /* Orange */
+      --color-border: #475569; /* Dark Slate */
+      --color-padding: #bbf7d0; /* Green */
+      --color-content: #bfdbfe; /* Blue */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Control Panel */
+    .controls-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .controls-panel h2 {
+      font-size: 18px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .control-header span.val {
+      font-family: monospace;
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #2563eb;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      font-size: 14px;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    /* Legend */
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .color-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    /* Playground / Stage */
+    .stage-container {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 480px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+      position: relative;
+      overflow: auto;
+    }
+
+    .stage-header {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 20px;
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .sandbox {
+      background: #f1f5f9;
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 380px;
+    }
+
+    /* Margin wrapper visualizer for Box 1 */
+    .margin-visualizer {
+      display: inline-block;
+      background-color: var(--color-margin);
+      border: 1px dashed #ea580c;
+      vertical-align: top;
+      transition: all 0.1s ease-out;
+    }
+
+    /* Box 1 */
+    #box1 {
+      background-color: var(--color-padding);
+      /* background-clip with double background creates distinct padding vs content colors */
+      background-image: linear-gradient(var(--color-content), var(--color-content));
+      background-clip: content-box;
+      border: 6px solid var(--color-border);
+      box-sizing: content-box;
+      color: #0f172a;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.1s ease-out;
+      overflow: hidden;
+      display: block;
+      width: 180px;
+      padding: 24px;
+      margin: 20px;
+    }
+
+    #box1 .content-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 40px;
+      font-size: 15px;
+    }
+
+    /* Box 2 (Static interactive peer) */
+    #box2 {
+      display: inline-block;
+      background: #e0e7ff;
+      border: 4px solid #6366f1;
+      color: #312e81;
+      font-weight: 700;
+      text-align: center;
+      padding: 24px;
+      margin: 16px;
+      width: 160px;
+      border-radius: 8px;
+      vertical-align: top;
+    }
+
+    /* CSS Inspector code block */
+    .css-inspector {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 16px;
+    }
+    .css-inspector span.prop { color: #38bdf8; }
+    .css-inspector span.val { color: #facc15; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>CSS Box Model & Display Interactive Lab</h1>
+    <p>Visualize how content, padding, border, and margin interact with the CSS display property.</p>
+  </header>
+
+  <div class="layout-grid">
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+      <h2>Box 1 Controls</h2>
+
+      <div class="control-group">
+        <div class="control-header">
+          <label for="ctrl-display">display</label>
+        </div>
+        <select id="ctrl-display">
+          <option value="block" selected>block</option>
+          <option value="inline-block">inline-block</option>
+          <option value="inline">inline</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <div class="control-header">
+          <label for="ctrl-width">width</label>
+          <span class="val" id="val-width">180px</span>
+        </div>
+        <input type="range" id="ctrl-width" min="50" max="360" value="180">
+      </div>
+
+      <div class="control-group">
+        <div class="control-header">
+          <label for="ctrl-padding">padding</label>
+          <span class="val" id="val-padding">24px</span>
+        </div>
+        <input type="range" id="ctrl-padding" min="0" max="80" value="24">
+      </div>
+
+      <div class="control-group">
+        <div class="control-header">
+          <label for="ctrl-border">border-width</label>
+          <span class="val" id="val-border">6px</span>
+        </div>
+        <input type="range" id="ctrl-border" min="0" max="25" value="6">
+      </div>
+
+      <div class="control-group">
+        <div class="control-header">
+          <label for="ctrl-margin">margin</label>
+          <span class="val" id="val-margin">20px</span>
+        </div>
+        <input type="range" id="ctrl-margin" min="0" max="80" value="20">
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="color-swatch" style="background: var(--color-content);"></div>
+          <span>Content Area</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-swatch" style="background: var(--color-padding);"></div>
+          <span>Padding Area</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-swatch" style="background: var(--color-border);"></div>
+          <span>Border (Solid)</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-swatch" style="background: var(--color-margin);"></div>
+          <span>Margin Area</span>
+        </div>
+      </div>
+
+      <!-- Live Generated CSS Block -->
+      <div class="css-inspector" id="css-code">
+        #box1 {<br>
+        &nbsp;&nbsp;<span class="prop">display</span>: <span class="val" id="code-display">block</span>;<br>
+        &nbsp;&nbsp;<span class="prop">width</span>: <span class="val" id="code-width">180px</span>;<br>
+        &nbsp;&nbsp;<span class="prop">padding</span>: <span class="val" id="code-padding">24px</span>;<br>
+        &nbsp;&nbsp;<span class="prop">border-width</span>: <span class="val" id="code-border">6px</span>;<br>
+        &nbsp;&nbsp;<span class="prop">margin</span>: <span class="val" id="code-margin">20px</span>;<br>
+        }
+      </div>
+    </div>
+
+    <!-- Playground Stage -->
+    <div class="stage-container">
+      <div class="stage-header">
+        Interactive Workspace: Observe how modifying Box 1 impacts Box 2's position and flow.
+      </div>
+      <div class="sandbox" id="sandbox">
+        <div class="margin-visualizer" id="margin-visualizer">
+          <div id="box1">
+            <div class="content-inner">Box 1 (Controlled)</div>
+          </div>
+        </div>
+        <div id="box2">
+          Box 2 (Peer)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const box1 = document.getElementById('box1');
+    const marginVisualizer = document.getElementById('margin-visualizer');
+
+    // Controls
+    const ctrlDisplay = document.getElementById('ctrl-display');
+    const ctrlWidth = document.getElementById('ctrl-width');
+    const ctrlPadding = document.getElementById('ctrl-padding');
+    const ctrlBorder = document.getElementById('ctrl-border');
+    const ctrlMargin = document.getElementById('ctrl-margin');
+
+    // Labels
+    const valWidth = document.getElementById('val-width');
+    const valPadding = document.getElementById('val-padding');
+    const valBorder = document.getElementById('val-border');
+    const valMargin = document.getElementById('val-margin');
+
+    // Code outputs
+    const codeDisplay = document.getElementById('code-display');
+    const codeWidth = document.getElementById('code-width');
+    const codePadding = document.getElementById('code-padding');
+    const codeBorder = document.getElementById('code-border');
+    const codeMargin = document.getElementById('code-margin');
+
+    function updateBox() {
+      const displayVal = ctrlDisplay.value;
+      const widthVal = ctrlWidth.value + 'px';
+      const paddingVal = ctrlPadding.value + 'px';
+      const borderVal = ctrlBorder.value + 'px';
+      const marginVal = ctrlMargin.value + 'px';
+
+      // Update Labels
+      valWidth.textContent = widthVal;
+      valPadding.textContent = paddingVal;
+      valBorder.textContent = borderVal;
+      valMargin.textContent = marginVal;
+
+      // Update Code Preview
+      codeDisplay.textContent = displayVal;
+      codeWidth.textContent = widthVal;
+      codePadding.textContent = paddingVal;
+      codeBorder.textContent = borderVal;
+      codeMargin.textContent = marginVal;
+
+      // Update Box 1 Styles
+      box1.style.display = displayVal;
+      box1.style.width = widthVal;
+      box1.style.padding = paddingVal;
+      box1.style.borderWidth = borderVal;
+
+      // For margin visualizer wrapper
+      marginVisualizer.style.display = displayVal;
+      marginVisualizer.style.padding = marginVal;
+      box1.style.margin = '0px'; // margin is visualized by outer wrapper padding
+
+      // Handle inline behavior
+      if (displayVal === 'inline') {
+        box1.style.width = 'auto';
+        codeWidth.textContent = 'auto (ignored on inline)';
+      }
+    }
+
+    [ctrlDisplay, ctrlWidth, ctrlPadding, ctrlBorder, ctrlMargin].forEach(el => {
+      el.addEventListener('input', updateBox);
+      el.addEventListener('change', updateBox);
+    });
+
+    updateBox();
+  </script>
+</body>
+</html>

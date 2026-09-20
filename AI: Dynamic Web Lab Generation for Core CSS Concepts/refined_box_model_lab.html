@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refined CSS Box Model Lab (Side-Specific Controls)</title>
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --panel-bg: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --accent: #38bdf8;
+      --color-margin: #ea580c; /* Orange */
+      --color-border: #94a3b8; /* Slate */
+      --color-padding: #16a34a; /* Green */
+      --color-content: #0284c7; /* Cyan/Blue */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .controls-panel h2 {
+      font-size: 18px;
+      font-weight: 600;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-top: 6px;
+    }
+
+    .control-row-4 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .control-header span.val {
+      font-family: monospace;
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #0f172a;
+      font-size: 14px;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    /* Legend */
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .color-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* CSS Inspector */
+    .css-inspector {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .css-inspector span.prop { color: #38bdf8; }
+    .css-inspector span.val { color: #facc15; }
+
+    /* Playground / Stage */
+    .stage-container {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: auto;
+    }
+
+    .stage-header {
+      font-size: 14px;
+      color: var(--text-muted);
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .sandbox {
+      background: #0b1120;
+      border: 2px dashed #334155;
+      border-radius: 8px;
+      padding: 24px;
+      min-height: 480px;
+      overflow: auto;
+    }
+
+    /* Margin visualizer wrapper */
+    .margin-visualizer {
+      display: inline-block;
+      background: rgba(234, 88, 12, 0.4);
+      border: 1px dashed #ea580c;
+      vertical-align: top;
+      transition: all 0.05s ease-out;
+    }
+
+    /* Box 1 */
+    #box1 {
+      background-color: rgba(22, 163, 74, 0.5);
+      background-image: linear-gradient(rgba(2, 132, 199, 0.8), rgba(2, 132, 199, 0.8));
+      background-clip: content-box;
+      border-style: solid;
+      border-color: var(--color-border);
+      box-sizing: content-box;
+      color: #ffffff;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.05s ease-out;
+      width: 200px;
+    }
+
+    #box1 .content-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      font-size: 14px;
+      padding: 4px;
+    }
+
+    /* Box 2 (Interactive peer) */
+    #box2 {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.25);
+      border: 3px solid #818cf8;
+      color: #c7d2fe;
+      font-weight: 700;
+      text-align: center;
+      padding: 24px;
+      margin: 16px;
+      width: 150px;
+      border-radius: 8px;
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Refined CSS Box Model & Display Lab</h1>
+    <p>Fine-tune side-specific padding, margin, border, and border-radius in real time.</p>
+  </header>
+
+  <div class="layout-grid">
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+      <h2>Interactive Controls</h2>
+
+      <div class="control-group">
+        <div class="control-header">
+          <label for="ctrl-display">display property</label>
+        </div>
+        <select id="ctrl-display">
+          <option value="block" selected>block</option>
+          <option value="inline-block">inline-block</option>
+          <option value="inline">inline</option>
+        </select>
+      </div>
+
+      <div class="control-row-4">
+        <div class="control-group">
+          <div class="control-header">
+            <label for="ctrl-width">width</label>
+            <span class="val" id="val-width">200px</span>
+          </div>
+          <input type="range" id="ctrl-width" min="60" max="360" value="200">
+        </div>
+        <div class="control-group">
+          <div class="control-header">
+            <label for="ctrl-radius">corner radius</label>
+            <span class="val" id="val-radius">0px</span>
+          </div>
+          <input type="range" id="ctrl-radius" min="0" max="60" value="0">
+        </div>
+      </div>
+
+      <!-- Padding Controls -->
+      <div class="section-title">Padding (Top / Right / Bottom / Left)</div>
+      <div class="control-row-4">
+        <div class="control-group">
+          <div class="control-header"><label>padding-top</label><span class="val" id="val-pt">20px</span></div>
+          <input type="range" id="ctrl-pt" min="0" max="60" value="20">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>padding-right</label><span class="val" id="val-pr">20px</span></div>
+          <input type="range" id="ctrl-pr" min="0" max="60" value="20">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>padding-bottom</label><span class="val" id="val-pb">20px</span></div>
+          <input type="range" id="ctrl-pb" min="0" max="60" value="20">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>padding-left</label><span class="val" id="val-pl">20px</span></div>
+          <input type="range" id="ctrl-pl" min="0" max="60" value="20">
+        </div>
+      </div>
+
+      <!-- Border Width Controls -->
+      <div class="section-title">Border Width (Top / Right / Bottom / Left)</div>
+      <div class="control-row-4">
+        <div class="control-group">
+          <div class="control-header"><label>border-top</label><span class="val" id="val-bt">4px</span></div>
+          <input type="range" id="ctrl-bt" min="0" max="24" value="4">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>border-right</label><span class="val" id="val-br">4px</span></div>
+          <input type="range" id="ctrl-br" min="0" max="24" value="4">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>border-bottom</label><span class="val" id="val-bb">4px</span></div>
+          <input type="range" id="ctrl-bb" min="0" max="24" value="4">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>border-left</label><span class="val" id="val-bl">4px</span></div>
+          <input type="range" id="ctrl-bl" min="0" max="24" value="4">
+        </div>
+      </div>
+
+      <!-- Margin Controls -->
+      <div class="section-title">Margin (Top / Right / Bottom / Left)</div>
+      <div class="control-row-4">
+        <div class="control-group">
+          <div class="control-header"><label>margin-top</label><span class="val" id="val-mt">20px</span></div>
+          <input type="range" id="ctrl-mt" min="0" max="60" value="20">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>margin-right</label><span class="val" id="val-mr">20px</span></div>
+          <input type="range" id="ctrl-mr" min="0" max="60" value="20">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>margin-bottom</label><span class="val" id="val-mb">20px</span></div>
+          <input type="range" id="ctrl-mb" min="0" max="60" value="20">
+        </div>
+        <div class="control-group">
+          <div class="control-header"><label>margin-left</label><span class="val" id="val-ml">20px</span></div>
+          <input type="range" id="ctrl-ml" min="0" max="60" value="20">
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><div class="color-swatch" style="background: var(--color-content);"></div><span>Content Area</span></div>
+        <div class="legend-item"><div class="color-swatch" style="background: var(--color-padding);"></div><span>Padding Area</span></div>
+        <div class="legend-item"><div class="color-swatch" style="background: var(--color-border);"></div><span>Border (Solid)</span></div>
+        <div class="legend-item"><div class="color-swatch" style="background: var(--color-margin);"></div><span>Margin Area</span></div>
+      </div>
+
+      <div class="css-inspector" id="css-preview">
+        #box1 {<br>
+        &nbsp;&nbsp;<span class="prop">display</span>: <span class="val" id="code-display">block</span>;<br>
+        &nbsp;&nbsp;<span class="prop">width</span>: <span class="val" id="code-width">200px</span>;<br>
+        &nbsp;&nbsp;<span class="prop">border-radius</span>: <span class="val" id="code-radius">0px</span>;<br>
+        &nbsp;&nbsp;<span class="prop">padding</span>: <span class="val" id="code-padding">20px 20px 20px 20px</span>;<br>
+        &nbsp;&nbsp;<span class="prop">border-width</span>: <span class="val" id="code-border">4px 4px 4px 4px</span>;<br>
+        &nbsp;&nbsp;<span class="prop">margin</span>: <span class="val" id="code-margin">20px 20px 20px 20px</span>;<br>
+        }
+      </div>
+    </div>
+
+    <!-- Playground Stage -->
+    <div class="stage-container">
+      <div class="stage-header">
+        Interactive Workspace: Observe Box 1's side-specific box-model footprint and relation to Box 2.
+      </div>
+      <div class="sandbox">
+        <div class="margin-visualizer" id="margin-visualizer">
+          <div id="box1">
+            <div class="content-inner">Box 1 (Controlled)</div>
+          </div>
+        </div>
+        <div id="box2">
+          Box 2 (Peer)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const box1 = document.getElementById('box1');
+    const marginVisualizer = document.getElementById('margin-visualizer');
+
+    // Controls
+    const ctrlDisplay = document.getElementById('ctrl-display');
+    const ctrlWidth = document.getElementById('ctrl-width');
+    const ctrlRadius = document.getElementById('ctrl-radius');
+
+    const ctrlPt = document.getElementById('ctrl-pt');
+    const ctrlPr = document.getElementById('ctrl-pr');
+    const ctrlPb = document.getElementById('ctrl-pb');
+    const ctrlPl = document.getElementById('ctrl-pl');
+
+    const ctrlBt = document.getElementById('ctrl-bt');
+    const ctrlBr = document.getElementById('ctrl-br');
+    const ctrlBb = document.getElementById('ctrl-bb');
+    const ctrlBl = document.getElementById('ctrl-bl');
+
+    const ctrlMt = document.getElementById('ctrl-mt');
+    const ctrlMr = document.getElementById('ctrl-mr');
+    const ctrlMb = document.getElementById('ctrl-mb');
+    const ctrlMl = document.getElementById('ctrl-ml');
+
+    // Labels
+    const valWidth = document.getElementById('val-width');
+    const valRadius = document.getElementById('val-radius');
+
+    const valPt = document.getElementById('val-pt');
+    const valPr = document.getElementById('val-pr');
+    const valPb = document.getElementById('val-pb');
+    const valPl = document.getElementById('val-pl');
+
+    const valBt = document.getElementById('val-bt');
+    const valBr = document.getElementById('val-br');
+    const valBb = document.getElementById('val-bb');
+    const valBl = document.getElementById('val-bl');
+
+    const valMt = document.getElementById('val-mt');
+    const valMr = document.getElementById('val-mr');
+    const valMb = document.getElementById('val-mb');
+    const valMl = document.getElementById('val-ml');
+
+    // Code outputs
+    const codeDisplay = document.getElementById('code-display');
+    const codeWidth = document.getElementById('code-width');
+    const codeRadius = document.getElementById('code-radius');
+    const codePadding = document.getElementById('code-padding');
+    const codeBorder = document.getElementById('code-border');
+    const codeMargin = document.getElementById('code-margin');
+
+    function updateStyles() {
+      const displayVal = ctrlDisplay.value;
+      const widthVal = ctrlWidth.value + 'px';
+      const radiusVal = ctrlRadius.value + 'px';
+
+      const pt = ctrlPt.value + 'px';
+      const pr = ctrlPr.value + 'px';
+      const pb = ctrlPb.value + 'px';
+      const pl = ctrlPl.value + 'px';
+
+      const bt = ctrlBt.value + 'px';
+      const br = ctrlBr.value + 'px';
+      const bb = ctrlBb.value + 'px';
+      const bl = ctrlBl.value + 'px';
+
+      const mt = ctrlMt.value + 'px';
+      const mr = ctrlMr.value + 'px';
+      const mb = ctrlMb.value + 'px';
+      const ml = ctrlMl.value + 'px';
+
+      // Update Labels
+      valWidth.textContent = widthVal;
+      valRadius.textContent = radiusVal;
+
+      valPt.textContent = pt; valPr.textContent = pr; valPb.textContent = pb; valPl.textContent = pl;
+      valBt.textContent = bt; valBr.textContent = br; valBb.textContent = bb; valBl.textContent = bl;
+      valMt.textContent = mt; valMr.textContent = mr; valMb.textContent = mb; valMl.textContent = ml;
+
+      // Update Code Preview
+      codeDisplay.textContent = displayVal;
+      codeWidth.textContent = displayVal === 'inline' ? 'auto (ignored on inline)' : widthVal;
+      codeRadius.textContent = radiusVal;
+      codePadding.textContent = `${pt} ${pr} ${pb} ${pl}`;
+      codeBorder.textContent = `${bt} ${br} ${bb} ${bl}`;
+      codeMargin.textContent = `${mt} ${mr} ${mb} ${ml}`;
+
+      // Apply Box 1 styles
+      box1.style.display = displayVal;
+      box1.style.width = displayVal === 'inline' ? 'auto' : widthVal;
+      box1.style.borderRadius = radiusVal;
+
+      box1.style.paddingTop = pt;
+      box1.style.paddingRight = pr;
+      box1.style.paddingBottom = pb;
+      box1.style.paddingLeft = pl;
+
+      box1.style.borderTopWidth = bt;
+      box1.style.borderRightWidth = br;
+      box1.style.borderBottomWidth = bb;
+      box1.style.borderLeftWidth = bl;
+
+      // Outer margin visualizer
+      marginVisualizer.style.display = displayVal;
+      marginVisualizer.style.borderRadius = radiusVal;
+      marginVisualizer.style.paddingTop = mt;
+      marginVisualizer.style.paddingRight = mr;
+      marginVisualizer.style.paddingBottom = mb;
+      marginVisualizer.style.paddingLeft = ml;
+    }
+
+    document.querySelectorAll('input, select').forEach(input => {
+      input.addEventListener('input', updateStyles);
+      input.addEventListener('change', updateStyles);
+    });
+
+    updateStyles();
+  </script>
+</body>
+</html>
