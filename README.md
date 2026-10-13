@@ -6,3 +6,4 @@ Welcome to my central hub for AI-assisted software engineering. This repository 
 * [Task: AI: C Preprocessor Co-Pilot](./AI:%20C%20Preprocessor%20Co-Pilot) - Using AI to identify preprocessor pitfalls and generate safe macro scaffolding.
 * [Task: AI: Dynamic Web Lab Generation for Core CSS Concepts](./AI:%20Dynamic%20Web%20Lab%20Generation%20for%20Core%20CSS%20Concepts) - Sequential prompting to generate interactive Box Model and Flexbox/Grid laboratories.
 * [Task: AI: SQL to ORM Refactoring and Security Analysis](./AI:%20SQL%20to%20ORM%20Refactoring%20and%20Security%20Analysis) - Refactoring procedural raw SQL into a secure, object-oriented SQLAlchemy ORM data layer.
+* [Task: AI: DevOps Philosophy and Tool Interrogation](./AI:%20DevOps%20Philosophy%20and%20Tool%20Interrogation) - Prompt engineering and architectural interrogation comparing Imperative (Bash) and Declarative (Puppet) configuration management paradigms at scale.
